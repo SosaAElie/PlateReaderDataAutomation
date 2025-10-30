@@ -1,20 +1,33 @@
-from PyQt5.QtWidgets import QStackedWidget, QApplication
+from PyQt5.QtWidgets import QStackedWidget, QApplication, QVBoxLayout, QWidget
 from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtCore import Qt
 from Pages.ElisaNeutralizationAssayPage import ElisaNeutralizationAssayPage
 from Pages.ElisaStandardsPage import ElisaStandardsPage
+from Pages.LuciferaseAssayPage import LuciferaseAssayPage
+from Classes.SwitchPagesBar import SwitchPagesBar
 import sys
 
-class StackedPage(QStackedWidget):
+class StackedPages(QStackedWidget):
     def __init__(self):
         super().__init__()
         self.setMinimumSize(400,600)
         self.setWindowTitle('ELISA and Neutralization Assay Automator')
         self.addWidget(ElisaStandardsPage(self))
         self.addWidget(ElisaNeutralizationAssayPage(self))
+        self.addWidget(LuciferaseAssayPage(self))
         self.show()
 
-    
+class ParentPage(QWidget):
+    def __init__(self)->None:
+        super().__init__()
+        stacked_pages = StackedPages()
+        switch_pages_bar = SwitchPagesBar(stacked_pages)
+        layout = QVBoxLayout(self)
+        layout.addWidget(switch_pages_bar)
+        layout.addWidget(stacked_pages)
+        self.setLayout(layout)
+
+        self.show()
 
 def dark_theme(app:QApplication)->QApplication:
     '''
@@ -44,5 +57,5 @@ def dark_theme(app:QApplication)->QApplication:
 	
 if __name__ == '__main__':
     app = dark_theme(QApplication([]))
-    main = StackedPage()
+    main = ParentPage()
     sys.exit(app.exec_())

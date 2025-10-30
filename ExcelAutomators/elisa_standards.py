@@ -64,11 +64,11 @@ async def main(data_filepath:str, template_filepath:str, destination:str, regres
     
     if make_excel:
         ewrapper.save_image(figure, f"A{ewrapper.get_last_row()}")
-        write_to_excel(ewrapper, samples, standards, parameters=extra_info)
+        write_to_excel(ewrapper, samples, standards, extra_info=extra_info)
         ewrapper.write_excel(new_dest)
         os.system(f'start excel "{new_dest}"')
 
-def write_to_excel(ewrapper:ExcelWrapper, samples:list[Sample], standards:list[Sample], r_squared:int = 1, parameters:list[float] = None)->None: 
+def write_to_excel(ewrapper:ExcelWrapper, samples:list[Sample], standards:list[Sample], extra_info:list[float]|float = None)->None: 
     '''Writes the label, values, average(std), ab_concentration stored in the Sample instance horizontally'''
     sample_headers = ["Samples"]
     standard_headers = ["Standards"]
@@ -96,12 +96,12 @@ def write_to_excel(ewrapper:ExcelWrapper, samples:list[Sample], standards:list[S
                 standard_data.insert(-2, "")
 
         last_col = ewrapper.add_row(row=row, data=standard_data, start_col="Q")
-    if parameters is not None:
+    if type(extra_info) == list:
         descriptions = ["Parameters", "A (The lower asymptote)","B (The slope factor)", "C (The EC50)","D (The upper asymptote)","G (The asymmetry factor, when 1 results in the 4PL Curve)"]
         ewrapper.add_column(last_col+1,descriptions, start_row=1)
-        ewrapper.add_column(last_col+2,["Optimized Values", *parameters], start_row=1)
+        ewrapper.add_column(last_col+2,["Optimized Values", *extra_info], start_row=1)
     else:
-        ewrapper.add_column(last_col+1, ["R-Squared", r_squared], start_row=1)
+        ewrapper.add_column(last_col+1, ["R-Squared", extra_info], start_row=1)
 
     ewrapper.add_row(row=1, data=sample_headers, start_col=last_col+3)
     for row, sample in zip(range(2, len(samples)+2),samples):
@@ -118,7 +118,7 @@ def get_linear_regression_function(x_values:list[float], y_values:list[float])->
     the inverse linear function is used to calculate the concentration of AB relative to the OD values of the standards'''
     slope, intercept = statistics.linear_regression(x_values, y_values)
     
-    r_squared = statistics.correlation(x_values, y_values)**2 #The sqaure of the pearson coeffecient is the coefficient of determination
+    r_squared = statistics.correlation(x_values, y_values)**2 #The square of the pearson coeffecient is the coefficient of determination
     print("The slope of the linear regression line is: ", slope, "\nThe intercept is: ", intercept, "\nThe R-squared value is: ", r_squared)
     return lambda y: (y-intercept)/slope, lambda x:slope*x+intercept, r_squared
 

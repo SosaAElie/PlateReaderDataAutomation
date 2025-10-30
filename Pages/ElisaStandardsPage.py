@@ -1,36 +1,29 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QFileDialog, QPushButton
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QFileDialog, QPushButton, QStackedWidget
 from PyQt5 import QtCore
-from PyQt5.QtGui import QFont, QPixmap
+from PyQt5.QtGui import QFont
 from Classes.ErrorMessageBox import ErrorMessageBox
 from Classes.FileSelector import FileSelector
 import ExcelAutomators.elisa_standards as es
 import asyncio
 
 class ElisaStandardsPage(QWidget):
-    def __init__(self,parent):
+    def __init__(self,parent:QStackedWidget):
         super().__init__(parent)
 
         self.file_selectors:list[FileSelector] = []
 
         self.vertical_layout = QVBoxLayout()
         self.setLayout(self.vertical_layout)
-        
-        self.switch_pages_button = QPushButton("Click me to switch pages")
-        self.vertical_layout.addWidget(self.switch_pages_button)
-        self.switch_pages_button.clicked.connect(lambda:parent.setCurrentIndex(1 if parent.currentIndex() != 1 else 0))
-    
-        
-        self.app_description = QLabel('Interpolates Concentration of Unknowns From a Set of Known Standards')
-        self.app_description.setFont(QFont('Helvetica', 12))
-        self.vertical_layout.addWidget(self.app_description, alignment=QtCore.Qt.AlignCenter)
-        
-        width = round(self.window().width()*1.25)
-        height = round(self.window().height()*1.25)
 
-        logo = QLabel(self)
-        logo.setPixmap(QPixmap('./Images/logo2.png').scaled(width, height))
-        self.vertical_layout.addWidget(logo, alignment=QtCore.Qt.AlignCenter)
+        self.app_description = QLabel('''
+        Python Software designed to interpolate the concentration of unknowns from a set of standards present on the plate.\n\n
+                                                    Current Limitations\n
+            1) Only processes data from the SoftMax Pro Optical Plate reader, accepts txt files in "plate" exported format\n
+            2) Only accepts 96 well plate csv template 
+                                    ''')
         
+        self.app_description.setFont(QFont('Helvetica', 12))
+        self.vertical_layout.addWidget(self.app_description, alignment=QtCore.Qt.AlignCenter)    
         
         file_selector = FileSelector(self)
         self.vertical_layout.addWidget(file_selector)
@@ -52,6 +45,8 @@ class ElisaStandardsPage(QWidget):
         self.vertical_layout.addWidget(self.process)
         self.process.clicked.connect(lambda:asyncio.run(self.process_elisa()))
         self.destination_filepath = ""
+
+        
 
     def select_destination(self):
         self.destination_filepath = QFileDialog.getExistingDirectory(self,'Select Directory')

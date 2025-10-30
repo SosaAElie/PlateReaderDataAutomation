@@ -191,6 +191,6 @@ class ExcelWrapper:
     @classmethod
     def new_excel(cls, wkbk_name:str, wkst_name:str):
         wkbk = Workbook()
-        wkst = wkbk.create_sheet(wkst_name)
+        # wkst = wkbk.create_sheet(wkst_name)
         wkbk.save(wkbk_name)
         return cls(wkbk_name)
