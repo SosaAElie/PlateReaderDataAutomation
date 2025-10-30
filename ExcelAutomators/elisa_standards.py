@@ -266,7 +266,7 @@ def check_and_append(storage:dict[str, Sample], label:str, od:float, sample_type
 
 def remove_prefixes(vals:list[str], sep:str = "-")->list[str]:
     '''Removes the prefix from the rest of the string using the 'seperator' as the barrier between both of them'''
-    return [val.split(sep)[-1] for val in vals]
+    return [val.split(sep, 1)[-1] for val in vals]
 
 def get_prefixes(vals:list[str], seperator:str = "-")->list[str]:
     '''Returns a list of prefixes from the rest of the string using the 'seperator' as the barrier between both of them'''
